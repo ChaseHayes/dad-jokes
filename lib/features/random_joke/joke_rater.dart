@@ -9,6 +9,7 @@ class JokeRater extends StatelessWidget {
     required this.onSubmit,
     required this.onRateSelect,
     required this.isStarFilled,
+    required this.isThankYouVisible,
   });
 
   final bool enabled;
@@ -16,6 +17,7 @@ class JokeRater extends StatelessWidget {
   final void Function() onSubmit;
   final void Function(int) onRateSelect;
   final bool Function(int) isStarFilled;
+  final bool isThankYouVisible;
 
   @override
   Widget build(BuildContext context) {
@@ -26,37 +28,41 @@ class JokeRater extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             child: Column(
               children: [
-                AnimatedOpacity(
-                  opacity: 1,
-                  duration: Duration(milliseconds: 50),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [1, 2, 3, 4, 5]
-                          .map((ratingNumber) => TextButton(
-                                child: Icon(
-                                  isStarFilled(ratingNumber) ? Icons.star : Icons.star_border,
-                                  size: 30,
-                                ),
-                                onPressed: () => enabled ? onRateSelect(ratingNumber) : null,
-                              ))
-                          .toList(),
+                Column(
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [1, 2, 3, 4, 5]
+                        .map((ratingNumber) => TextButton(
+                          child: Icon(
+                            isStarFilled(ratingNumber) ? Icons.star : Icons.star_border,
+                            size: 30,
+                          ),
+                          onPressed: () => enabled ? onRateSelect(ratingNumber) : null,
+                        ))
+                        .toList(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: TextButton(
+                        onPressed: () => onSubmit(),
+                        child: Text('Submit')
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: TextButton(
-                          onPressed: () => onSubmit(),
-                          child: Text('Submit')
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
+        AnimatedOpacity(
+          opacity: isThankYouVisible ? 1 : 0,
+          duration: Duration(milliseconds: 150),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text('Thank you! :)'),
+          ),
+        )
       ],
     );
   }

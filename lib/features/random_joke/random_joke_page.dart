@@ -19,6 +19,7 @@ class _RandomJokePageState extends State<RandomJokePage> {
   var _joke = jokes[Random().nextInt(jokes.length)];
   var _rating = Rating(0);
   var _isRatingVisible = false;
+  var _isThankYouVisible = false;
 
   void _toggleShowRating() {
     setState(() {
@@ -30,6 +31,8 @@ class _RandomJokePageState extends State<RandomJokePage> {
     setState(() {
       _joke = jokes[Random().nextInt(jokes.length)];
       _isRatingVisible = false;
+      _isThankYouVisible = false;
+      _rating = Rating(0);
     });
   }
 
@@ -47,6 +50,9 @@ class _RandomJokePageState extends State<RandomJokePage> {
     FirebaseFirestore.instance.collection('Ratings').add(<String, String>{
       'joke': _joke,
       'score': _rating.score.toString(),
+    });
+    setState(() {
+      _isThankYouVisible = true;
     });
   }
 
@@ -83,6 +89,7 @@ class _RandomJokePageState extends State<RandomJokePage> {
                 onRateSelect: _handleRateSelect,
                 isStarFilled: _isStarFilled,
                 onSubmit: _handleSubmit,
+                isThankYouVisible: _isThankYouVisible,
               )),
         ],
       ),
