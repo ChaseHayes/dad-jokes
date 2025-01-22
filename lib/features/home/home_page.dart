@@ -1,5 +1,5 @@
+import 'package:dad_jokes/features/random_joke/random_joke_page.dart';
 import 'package:flutter/material.dart';
-import '../random_joke/random_joke_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -33,7 +33,7 @@ class _MyHomePageState extends State<HomePage> {
                 extended: constraints.maxWidth >= 600,
                 destinations: [
                   NavigationRailDestination(
-                    icon: Icon(Icons.heat_pump),
+                    icon: Icon(Icons.question_mark),
                     label: Text('Random Joke'),
                   ),
                   NavigationRailDestination(
