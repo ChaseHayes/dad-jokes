@@ -1,36 +1,21 @@
 import 'package:dad_jokes/features/random_joke/models/rating.dart';
 import 'package:flutter/material.dart';
 
-class JokeRater extends StatefulWidget {
+class JokeRater extends StatelessWidget {
   const JokeRater({
     super.key,
-    required enabled,
-    required onSubmit,
-  }) : _enabled = enabled, _onSubmit = onSubmit;
+    required this.enabled,
+    required this.rating,
+    required this.onSubmit,
+    required this.onRateSelect,
+    required this.isStarFilled,
+  });
 
-  final bool _enabled;
-  final void Function(Rating) _onSubmit;
-
-  @override
-  State<JokeRater> createState() => _JokeRaterState();
-}
-
-class _JokeRaterState extends State<JokeRater> {
-  var _rating = Rating(0);
-
-  void _setRating(int score) {
-    setState(() {
-      _rating = Rating(score);
-    });
-  }
-
-  bool _isStarFilled(int starNumber) {
-    return _rating.score >= starNumber;
-  }
-
-  void _handleSubmit() {
-    widget._onSubmit(_rating);
-  }
+  final bool enabled;
+  final Rating rating;
+  final void Function() onSubmit;
+  final void Function(int) onRateSelect;
+  final bool Function(int) isStarFilled;
 
   @override
   Widget build(BuildContext context) {
@@ -41,24 +26,31 @@ class _JokeRaterState extends State<JokeRater> {
             padding: const EdgeInsets.all(10),
             child: Column(
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [1, 2, 3, 4, 5]
-                    .map((ratingNumber) => TextButton(
-                        child: Icon(
-                          _isStarFilled(ratingNumber) ? Icons.star : Icons.star_border,
-                          size: 30,
+                AnimatedOpacity(
+                  opacity: 1,
+                  duration: Duration(milliseconds: 50),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [1, 2, 3, 4, 5]
+                          .map((ratingNumber) => TextButton(
+                                child: Icon(
+                                  isStarFilled(ratingNumber) ? Icons.star : Icons.star_border,
+                                  size: 30,
+                                ),
+                                onPressed: () => enabled ? onRateSelect(ratingNumber) : null,
+                              ))
+                          .toList(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: TextButton(
+                          onPressed: () => onSubmit(),
+                          child: Text('Submit')
                         ),
-                        onPressed: () => widget._enabled ? _setRating(ratingNumber) : null,
-                      )
-                    )
-                    .toList(),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: TextButton(
-                    onPressed: _handleSubmit,
-                    child: Text('Submit')
+                      ),
+                    ],
                   ),
                 ),
               ],

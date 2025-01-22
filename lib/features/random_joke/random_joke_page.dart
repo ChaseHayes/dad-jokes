@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dad_jokes/features/random_joke/joke_card.dart';
 import 'package:dad_jokes/features/random_joke/joke_rater.dart';
 import 'package:dad_jokes/features/random_joke/data/jokes.dart';
@@ -16,7 +17,7 @@ class RandomJokePage extends StatefulWidget {
 
 class _RandomJokePageState extends State<RandomJokePage> {
   var _joke = jokes[Random().nextInt(jokes.length)];
-
+  var _rating = Rating(0);
   var _isRatingVisible = false;
 
   void _toggleShowRating() {
@@ -28,6 +29,24 @@ class _RandomJokePageState extends State<RandomJokePage> {
   void _getNewJoke() {
     setState(() {
       _joke = jokes[Random().nextInt(jokes.length)];
+      _isRatingVisible = false;
+    });
+  }
+
+  bool _isStarFilled(int starNumber) {
+    return _rating.score >= starNumber;
+  }
+
+  void _handleRateSelect(int ratingNumber) {
+    setState(() {
+      _rating = Rating(ratingNumber);
+    });
+  }
+
+  void _handleSubmit() {
+    FirebaseFirestore.instance.collection('Ratings').add(<String, String>{
+      'joke': _joke,
+      'score': _rating.score.toString(),
     });
   }
 
@@ -56,12 +75,15 @@ class _RandomJokePageState extends State<RandomJokePage> {
           ),
           SizedBox(height: 20),
           AnimatedOpacity(
-            opacity: _isRatingVisible ? 1 : 0,
-            duration: Duration(milliseconds: 250),
-            child: JokeRater(
-              enabled: _isRatingVisible,
-              onSubmit: (Rating rating) => print('Submitted score is: ${rating.score}')),
-          ),
+              opacity: _isRatingVisible ? 1 : 0,
+              duration: Duration(milliseconds: 250),
+              child: JokeRater(
+                enabled: _isRatingVisible,
+                rating: _rating,
+                onRateSelect: _handleRateSelect,
+                isStarFilled: _isStarFilled,
+                onSubmit: _handleSubmit,
+              )),
         ],
       ),
     );
