@@ -7,11 +7,14 @@ import 'package:flutter/material.dart';
 
 class RandomJokePage extends StatefulWidget {
   final String Function() _getRandomJoke;
+  final Future<DocumentReference<Map<String, dynamic>>> Function(String joke, Rating rating) _postJokeRating;
 
   const RandomJokePage({
     super.key,
     String Function()? getRandomJoke,
-  }): _getRandomJoke = getRandomJoke ?? JokesAPI.getRandomJoke;
+    Future<DocumentReference<Map<String, dynamic>>> Function(String joke, Rating rating)? postJokeRating,
+  }): _getRandomJoke = getRandomJoke ?? JokesAPI.getRandomJoke,
+      _postJokeRating = postJokeRating ?? JokesAPI.postJokeRating;
 
   @override
   State<RandomJokePage> createState() => _RandomJokePageState();
@@ -55,7 +58,7 @@ class _RandomJokePageState extends State<RandomJokePage> {
   }
 
   void _handleSubmit() async {
-    await JokesAPI.postJokeRating(_joke, _rating);
+    await widget._postJokeRating(_joke, _rating);
     setState(() {
       _isThankYouVisible = true;
     });

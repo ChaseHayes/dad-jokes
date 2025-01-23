@@ -23,12 +23,20 @@ void main() {
   });
 
   testWidgets('user can rate a joke', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: RandomJokePage()));
+    const randomJoke = 'Knock knock';
+    String getRandomJokeMock() => randomJoke;
+
+    await tester.pumpWidget(MaterialApp(home: RandomJokePage(getRandomJoke: getRandomJokeMock)));
 
     await tester.scrollUntilVisible(find.text('How did I do?'), 200);
 
     await tester.tap(find.text('How did I do?'));
 
+    await tester.tap(find.byKey(Key('Star5')));
+
     expect(find.text('Submit'), findsOneWidget);
+
+    // assert post was called with expected params
+    // assert thank you message is displayed
   });
 }

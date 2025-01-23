@@ -34,6 +34,7 @@ class JokeRater extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [1, 2, 3, 4, 5]
                         .map((ratingNumber) => TextButton(
+                          key: Key('Star$ratingNumber'),
                           child: Icon(
                             isStarFilled(ratingNumber) ? Icons.star : Icons.star_border,
                             size: 30,
