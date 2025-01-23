@@ -1,25 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dad_jokes/features/random_joke/api/jokes.dart';
 import 'package:dad_jokes/features/random_joke/joke_card.dart';
 import 'package:dad_jokes/features/random_joke/joke_rater.dart';
-import 'package:dad_jokes/features/random_joke/data/jokes.dart';
 import 'package:dad_jokes/features/random_joke/models/rating.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 class RandomJokePage extends StatefulWidget {
+  final String Function() _getRandomJoke;
+
   const RandomJokePage({
     super.key,
-  });
+    String Function()? getRandomJoke,
+  }): _getRandomJoke = getRandomJoke ?? JokesAPI.getRandomJoke;
 
   @override
   State<RandomJokePage> createState() => _RandomJokePageState();
 }
 
 class _RandomJokePageState extends State<RandomJokePage> {
-  var _joke = jokes[Random().nextInt(jokes.length)];
+  String _joke = '';
   var _rating = Rating(0);
   var _isRatingVisible = false;
   var _isThankYouVisible = false;
+
+  @override
+  void initState() {
+    _joke = widget._getRandomJoke();
+    super.initState();
+  }
 
   void _toggleShowRating() {
     setState(() {
@@ -29,7 +37,7 @@ class _RandomJokePageState extends State<RandomJokePage> {
 
   void _getNewJoke() {
     setState(() {
-      _joke = jokes[Random().nextInt(jokes.length)];
+      _joke = widget._getRandomJoke();
       _isRatingVisible = false;
       _isThankYouVisible = false;
       _rating = Rating(0);
@@ -46,11 +54,8 @@ class _RandomJokePageState extends State<RandomJokePage> {
     });
   }
 
-  void _handleSubmit() {
-    FirebaseFirestore.instance.collection('Ratings').add(<String, String>{
-      'joke': _joke,
-      'score': _rating.score.toString(),
-    });
+  void _handleSubmit() async {
+    await JokesAPI.postJokeRating(_joke, _rating);
     setState(() {
       _isThankYouVisible = true;
     });
@@ -59,13 +64,13 @@ class _RandomJokePageState extends State<RandomJokePage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: ListView(
+        shrinkWrap: true,
         children: [
           JokeCard(joke: _joke),
           SizedBox(height: 10),
           Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton.icon(
                 onPressed: _toggleShowRating,
